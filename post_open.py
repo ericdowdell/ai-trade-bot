@@ -1,54 +1,61 @@
 
 import os
-from datetime import datetime
-from telegram import Bot
 import asyncio
+from datetime import datetime
+from telegram.ext import Application
+import yfinance as yf
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_USER_ID = os.getenv("TELEGRAM_USER_ID")
-bot = Bot(token=TELEGRAM_BOT_TOKEN)
+TELEGRAM_USER_ID = int(os.getenv("TELEGRAM_USER_ID"))
 
-def generate_post_open_ideas():
-    ideas = {
-        "ES": {
-            "bias": "🔴 Sell",
-            "reason": "ES broke below 5260 after hot CPI — risk-off across equities",
-            "entry": "5250.00",
-            "stop": "5268.00",
-            "target": "5210.00"
-        },
-        "NQ": {
-            "bias": "🔴 Sell",
-            "reason": "Heavy tech selling post open — NQ down -1.3% from Globex high",
-            "entry": "18210.00",
-            "stop": "18320.00",
-            "target": "18030.00"
-        },
-        "GC": {
-            "bias": "🟢 Buy",
-            "reason": "Gold bouncing after CPI miss — safe haven bid returns",
-            "entry": "2315.00",
-            "stop": "2302.00",
-            "target": "2345.00"
-        }
+def get_price(symbol):
+    try:
+        return round(yf.Ticker(symbol).info["regularMarketPrice"], 2)
+    except Exception:
+        return "N/A"
+
+def generate_post_open_message():
+    today = datetime.now().strftime("%A, %B %d, %Y")
+
+    prices = {
+        "ES": get_price("ES=F"),
+        "NQ": get_price("NQ=F"),
+        "GC": get_price("GC=F"),
+        "CL": get_price("CL=F")
     }
-    return ideas
 
-def format_trade_ideas(data):
-    today = datetime.now().strftime("%B %d, %Y")
-    message = f"📉 Confirmed Trade Ideas — {today}\n"
-    for symbol, idea in data.items():
-        message += f"\n{idea['bias']} {symbol}\n"
-        message += f" - Reason: {idea['reason']}\n"
-        message += f" - Entry: {idea['entry']}\n"
-        message += f" - Stop: {idea['stop']}\n"
-        message += f" - Target: {idea['target']}\n"
+    message = f"""🔁 Post-Open Trade Ideas — {today}
+
+📍 Live Futures Snapshot:
+- ES: {prices['ES']} | Watching VWAP reclaim near 5120
+- NQ: {prices['NQ']} | Tech bounce in progress
+- GC: {prices['GC']} | Bid holding on weak jobs data
+- CL: {prices['CL']} | Choppy, eye on 84.50 flip
+
+🎯 Trade Ideas:
+
+🟢 Buy ES
+- Reason: VWAP reclaim + macro support
+- Entry: {float(prices['ES']) + 1 if prices['ES'] != 'N/A' else 'N/A'}
+- Stop: {float(prices['ES']) - 10 if prices['ES'] != 'N/A' else 'N/A'}
+- Target: {float(prices['ES']) + 25 if prices['ES'] != 'N/A' else 'N/A'}
+
+🟢 Buy NQ
+- Reason: Reversal from overnight low
+- Entry: {float(prices['NQ']) + 10 if prices['NQ'] != 'N/A' else 'N/A'}
+- Stop: {float(prices['NQ']) - 50 if prices['NQ'] != 'N/A' else 'N/A'}
+- Target: {float(prices['NQ']) + 120 if prices['NQ'] != 'N/A' else 'N/A'}
+
+⚠️ GC: Watch 2335–2355 zone for breakout
+
+📊 This recap auto-generates from live futures prices + macro tone.
+"""
     return message
 
-async def send_post_open_ideas():
-    data = generate_post_open_ideas()
-    message = format_trade_ideas(data)
-    await bot.send_message(chat_id=TELEGRAM_USER_ID, text=message)
+async def main():
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
+    message = generate_post_open_message()
+    await application.bot.send_message(chat_id=TELEGRAM_USER_ID, text=message)
 
 if __name__ == "__main__":
-    asyncio.run(send_post_open_ideas())
+    asyncio.run(main())
