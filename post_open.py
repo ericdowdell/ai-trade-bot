@@ -9,12 +9,15 @@ import matplotlib.pyplot as plt
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_USER_ID = int(os.getenv("TELEGRAM_USER_ID"))
 
+# Function to get live market prices using yfinance
 def get_price(symbol):
     try:
         return round(yf.Ticker(symbol).info["regularMarketPrice"], 2)
-    except Exception:
+    except Exception as e:
+        print(f"Error fetching {symbol}: {e}")
         return "N/A"
 
+# Function to generate trade ideas based on live data
 def generate_trade_ideas():
     prices = {
         "ES": get_price("ES=F"),
@@ -22,6 +25,7 @@ def generate_trade_ideas():
         "CL": get_price("CL=F")
     }
 
+    # Create trade ideas based on current market prices
     trade_data = {
         "ES": {
             "entry": prices["ES"],
@@ -45,6 +49,7 @@ def generate_trade_ideas():
 
     return prices, trade_data
 
+# Function to generate the chart for each trade idea
 def generate_chart(symbol, entry, stop, target):
     price_range = [min(entry, stop, target) - 3, max(entry, stop, target) + 3]
     plt.figure(figsize=(8, 3))
@@ -62,12 +67,13 @@ def generate_chart(symbol, entry, stop, target):
     plt.close()
     return chart_file
 
+# Main function to generate message and send to Telegram with chart images
 async def main():
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     today = datetime.now().strftime("%A, %B %d, %Y")
     prices, trades = generate_trade_ideas()
 
-    # Main text message
+    # Prepare the main text message
     text = f"🔁 Post-Open Trade Ideas — {today}\n\n"
     text += "🧠 Macro Recap:\n"
     text += "- CPI missed expectations, supporting equities\n"
@@ -82,9 +88,10 @@ async def main():
         text += f"🟢 {('Buy' if symbol != 'CL' else 'Sell')} {symbol} — Entry: {data['entry']} | Stop: {data['stop']} | Target: {data['target']}\n"
         text += f"📌 Reason: {data['reason']}\n\n"
 
+    # Send the message to Telegram
     await application.bot.send_message(chat_id=TELEGRAM_USER_ID, text=text)
 
-    # Chart images
+    # Prepare and send the chart images
     media_group = []
     for symbol, data in trades.items():
         image_path = generate_chart(symbol, data['entry'], data['stop'], data['target'])
