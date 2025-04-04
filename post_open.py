@@ -73,12 +73,10 @@ async def main():
     today = datetime.now().strftime("%A, %B %d, %Y")
     prices, trades = generate_trade_ideas()
 
-    # Prepare the main text message
+    # Prepare the main text message without any CPI reference, using only live data
     text = f"🔁 Post-Open Trade Ideas — {today}\n\n"
-    text += "🧠 Macro Recap:\n"
-    text += "- CPI missed expectations, supporting equities\n"
-    text += "- GC gaining on weaker USD\n"
-    text += "- CL reversing after inventory data\n\n"
+    text += "🧠 Market Recap:\n"
+    text += "No scheduled economic events today impacting the market directly. Monitoring tech, commodities, and market reactions to global flows.\n\n"
 
     text += "📍 Futures Snapshot:\n"
     text += f"- ES: {prices['ES']} | NQ: {prices['NQ']} | CL: {prices['CL']}\n\n"
