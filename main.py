@@ -10,10 +10,50 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_USER_ID = os.getenv("TELEGRAM_USER_ID")
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
-def load_trade_ideas():
-    with open("trade_ideas.json", "r") as f:
-        return json.load(f)
+# STEP 1: Generate new trade ideas (live-style)
+def generate_trade_ideas():
+    ideas = {
+        "ES": {
+            "bias": "🟢 Buy",
+            "reason": "CPI slowed + ECB rate cut supports risk-on sentiment",
+            "entry": "5275.00",
+            "stop": "5258.00",
+            "target": "5315.00"
+        },
+        "NQ": {
+            "bias": "🟢 Buy",
+            "reason": "Tech leading on cooling inflation expectations",
+            "entry": "18320.00",
+            "stop": "18200.00",
+            "target": "18520.00"
+        },
+        "YM": {
+            "bias": "⚠️ Neutral",
+            "reason": "Dow remains directionless amid sector rotation",
+            "entry": "—",
+            "stop": "—",
+            "target": "—"
+        },
+        "GC": {
+            "bias": "🟢 Buy",
+            "reason": "Lower real yields + geopolitical risk support safe havens",
+            "entry": "2312.00",
+            "stop": "2298.00",
+            "target": "2345.00"
+        },
+        "CL": {
+            "bias": "🔴 Sell",
+            "reason": "EIA shows inventory build; demand outlook weak",
+            "entry": "84.70",
+            "stop": "85.60",
+            "target": "82.90"
+        }
+    }
+    with open("trade_ideas.json", "w") as f:
+        json.dump(ideas, f, indent=4)
+    return ideas
 
+# STEP 2: Format the message
 def format_message(trade_data):
     today = datetime.now().strftime("%B %d")
     message = f"📊 Trade Ideas — {today}\n"
@@ -25,13 +65,14 @@ def format_message(trade_data):
         message += f" - Target: {idea['target']}\n"
     return message
 
-async def send_daily_trade_ideas():
+# STEP 3: Send to Telegram
+async def send_trade_ideas():
     try:
-        data = load_trade_ideas()
-        message = format_message(data)
+        ideas = generate_trade_ideas()
+        message = format_message(ideas)
         await bot.send_message(chat_id=TELEGRAM_USER_ID, text=message)
     except Exception as e:
-        logging.error(f"Error sending message: {e}")
+        logging.error(f"Error sending trade ideas: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(send_daily_trade_ideas())
+    asyncio.run(send_trade_ideas())
