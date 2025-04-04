@@ -1,12 +1,11 @@
 
 import os
-from datetime import datetime
-from telegram import Bot
 import asyncio
+from datetime import datetime
+from telegram.ext import Application
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_USER_ID = os.getenv("TELEGRAM_USER_ID")
-bot = Bot(token=TELEGRAM_BOT_TOKEN)
+TELEGRAM_USER_ID = int(os.getenv("TELEGRAM_USER_ID"))  # Ensure it's an int
 
 def generate_pre_market_message():
     today = datetime.now().strftime("%B %d, %Y")
@@ -31,9 +30,10 @@ Stay alert for CPI + Fed speak before open.
 """
     return message
 
-async def send_pre_market():
-    msg = generate_pre_market_message()
-    await bot.send_message(chat_id=TELEGRAM_USER_ID, text=msg)
+async def main():
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
+    message = generate_pre_market_message()
+    await application.bot.send_message(chat_id=TELEGRAM_USER_ID, text=message)
 
 if __name__ == "__main__":
-    asyncio.run(send_pre_market())
+    asyncio.run(main())
