@@ -1,0 +1,37 @@
+{
+    "ES": {
+        "bias": "\ud83d\udfe2 Buy",
+        "reason": "Fed dovish tone + CPI under forecast",
+        "entry": "5230",
+        "stop": "5215",
+        "target": "5265"
+    },
+    "NQ": {
+        "bias": "\ud83d\udfe2 Buy",
+        "reason": "Tech sector momentum + no major bearish headlines",
+        "entry": "18120",
+        "stop": "18000",
+        "target": "18350"
+    },
+    "YM": {
+        "bias": "\u26a0\ufe0f Neutral",
+        "reason": "Mixed data from ISM & Manufacturing",
+        "entry": "\u2014",
+        "stop": "\u2014",
+        "target": "\u2014"
+    },
+    "GC": {
+        "bias": "\ud83d\udfe2 Buy",
+        "reason": "Gold supported by real yields dropping",
+        "entry": "2265",
+        "stop": "2250",
+        "target": "2295"
+    },
+    "CL": {
+        "bias": "\ud83d\udd34 Sell",
+        "reason": "Oil pressured by high inventories",
+        "entry": "85.10",
+        "stop": "85.90",
+        "target": "83.40"
+    }
+}
