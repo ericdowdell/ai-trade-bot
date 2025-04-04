@@ -1,8 +1,8 @@
 
 import os
-import json
 from datetime import datetime
 from telegram import Bot
+import asyncio
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_USER_ID = os.getenv("TELEGRAM_USER_ID")
@@ -31,9 +31,9 @@ Stay alert for CPI + Fed speak before open.
 """
     return message
 
-def send_pre_market():
+async def send_pre_market():
     msg = generate_pre_market_message()
-    bot.send_message(chat_id=TELEGRAM_USER_ID, text=msg)
+    await bot.send_message(chat_id=TELEGRAM_USER_ID, text=msg)
 
 if __name__ == "__main__":
-    send_pre_market()
+    asyncio.run(send_pre_market())

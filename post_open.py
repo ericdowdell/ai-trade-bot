@@ -1,8 +1,8 @@
 
 import os
-import json
 from datetime import datetime
 from telegram import Bot
+import asyncio
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_USER_ID = os.getenv("TELEGRAM_USER_ID")
@@ -45,10 +45,10 @@ def format_trade_ideas(data):
         message += f" - Target: {idea['target']}\n"
     return message
 
-def send_post_open_ideas():
+async def send_post_open_ideas():
     data = generate_post_open_ideas()
     message = format_trade_ideas(data)
-    bot.send_message(chat_id=TELEGRAM_USER_ID, text=message)
+    await bot.send_message(chat_id=TELEGRAM_USER_ID, text=message)
 
 if __name__ == "__main__":
-    send_post_open_ideas()
+    asyncio.run(send_post_open_ideas())
