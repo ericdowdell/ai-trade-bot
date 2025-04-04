@@ -5,30 +5,31 @@ from datetime import datetime
 from telegram.ext import Application
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_USER_ID = int(os.getenv("TELEGRAM_USER_ID"))  # Ensure it's an int
+TELEGRAM_USER_ID = int(os.getenv("TELEGRAM_USER_ID"))
+
+def get_calendar_summary():
+    try:
+        with open("calendar_summary.txt", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "📅 No economic events found for today."
 
 def generate_pre_market_message():
     today = datetime.now().strftime("%B %d, %Y")
-    message = f"""📊 Pre-Market Overview — {today}
+    macro_summary = f"""📊 Pre-Market Overview — {today}
 
-🌍 Global Macro:
-- Nikkei down -2.7% on tariff fears
-- ECB cuts rates 25bps — dovish tone
-- CPI due at 8:30 AM ET — expected soft print
+🌍 Global Macro Highlights:
+- Asia mixed, Europe flat ahead of US data
+- Traders eye Fed reaction to jobs data
 
-🧠 Sentiment Watch:
-- Tech weakness likely if CPI surprises hot
-- Safe haven flow to GC possible
-- Oil reacting to geopolitical risk, eye on EIA report
+{get_calendar_summary()}
 
 🎯 Pre-Market Bias:
 🟢 GC — Favor long above 2305
-⚠️ ES — Wait for CPI confirmation
-🔴 CL — Risk of breakdown below 84.50
-
-Stay alert for CPI + Fed speak before open.
+⚠️ ES — Wait for confirmation post open
+🔴 CL — Weak below 84.50
 """
-    return message
+    return macro_summary
 
 async def main():
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
